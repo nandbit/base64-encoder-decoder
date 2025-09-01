@@ -28,6 +28,9 @@ pub const Base64 = struct {
         // 1. 3 byte window
         // 2. 2 byte window
         // 3. 1 byte window
+        if (input.len == 0) {
+            return "";
+        }
         var buf = [3]u8{ 0, 0, 0 };
         const n_out = try _calc_encode_length(input);
         var output = try allocator.alloc(u8, n_out);
@@ -64,6 +67,9 @@ pub const Base64 = struct {
     }
 
     pub fn decode(self: Base64, allocator: std.mem.Allocator, input: []const u8) ![]u8 {
+        if (input.len == 0) {
+            return "";
+        }
         var buf = [4]u8{ 0, 0, 0, 0 };
         const n_out = try _calc_decode_length(input);
         var output = try allocator.alloc(u8, n_out);
