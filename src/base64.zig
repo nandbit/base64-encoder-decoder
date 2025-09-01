@@ -118,12 +118,8 @@ pub const Base64 = struct {
         var output_groups: usize = n_groups * 3;
 
         for (input) |byte| {
-            // We break here because if we see a '=', that means
-            // we reached the end of the data, since '=' can only
-            // appear at the very end of the data (as padding).
             if (byte == '=') {
                 output_groups -= 1;
-                break;
             }
         }
 
