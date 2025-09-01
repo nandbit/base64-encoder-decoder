@@ -140,17 +140,89 @@ pub const Base64 = struct {
     }
 };
 
-test "test encoder" {
-    const input = "Base 64 encode decode test";
-    const expected_output = "QmFzZSA2NCBlbmNvZGUgZGVjb2RlIHRlc3Q=";
+// RFC 4648 tests (https://datatracker.ietf.org/doc/html/rfc4648)
+test "test encoder decoder" {
     const base64 = Base64.init();
     const allocator = std.testing.allocator;
-    const encoded_text = try base64.encode(allocator, input);
-    const decoded_text = try base64.decode(allocator, encoded_text);
 
-    defer allocator.free(encoded_text);
-    defer allocator.free(decoded_text);
+    const enc1 = try base64.encode(allocator, "");
+    const dec1 = try base64.decode(allocator, "");
 
-    try expect(std.mem.eql(u8, encoded_text, expected_output));
-    try expect(std.mem.eql(u8, decoded_text, input));
+    const enc2 = try base64.encode(allocator, "f");
+    const dec2 = try base64.decode(allocator, "Zg==");
+
+    const enc3 = try base64.encode(allocator, "fo");
+    const dec3 = try base64.decode(allocator, "Zm8=");
+
+    const enc4 = try base64.encode(allocator, "foo");
+    const dec4 = try base64.decode(allocator, "Zm9v");
+
+    const enc5 = try base64.encode(allocator, "foob");
+    const dec5 = try base64.decode(allocator, "Zm9vYg==");
+
+    const enc6 = try base64.encode(allocator, "fooba");
+    const dec6 = try base64.decode(allocator, "Zm9vYmE=");
+
+    const enc7 = try base64.encode(allocator, "foobar");
+    const dec7 = try base64.decode(allocator, "Zm9vYmFy");
+
+    const enc8 = try base64.encode(allocator, "foobarfoobarfoo");
+    const dec8 = try base64.decode(allocator, "Zm9vYmFyZm9vYmFyZm9v");
+
+    const enc9 = try base64.encode(allocator, "foobarfoobarfoob");
+    const dec9 = try base64.decode(allocator, "Zm9vYmFyZm9vYmFyZm9vYg==");
+
+    const enc10 = try base64.encode(allocator, "foobarfoobarfooba");
+    const dec10 = try base64.decode(allocator, "Zm9vYmFyZm9vYmFyZm9vYmE=");
+
+    const enc11 = try base64.encode(allocator, "foobarfoobarfoobar");
+    const dec11 = try base64.decode(allocator, "Zm9vYmFyZm9vYmFyZm9vYmFy");
+
+    defer allocator.free(enc1);
+    defer allocator.free(enc2);
+    defer allocator.free(enc3);
+    defer allocator.free(enc4);
+    defer allocator.free(enc5);
+    defer allocator.free(enc6);
+    defer allocator.free(enc7);
+    defer allocator.free(enc8);
+    defer allocator.free(enc9);
+    defer allocator.free(enc10);
+    defer allocator.free(enc11);
+
+    defer allocator.free(dec1);
+    defer allocator.free(dec2);
+    defer allocator.free(dec3);
+    defer allocator.free(dec4);
+    defer allocator.free(dec5);
+    defer allocator.free(dec6);
+    defer allocator.free(dec7);
+    defer allocator.free(dec8);
+    defer allocator.free(dec9);
+    defer allocator.free(dec10);
+    defer allocator.free(dec11);
+
+    try expect(std.mem.eql(u8, enc1, ""));
+    try expect(std.mem.eql(u8, enc2, "Zg=="));
+    try expect(std.mem.eql(u8, enc3, "Zm8="));
+    try expect(std.mem.eql(u8, enc4, "Zm9v"));
+    try expect(std.mem.eql(u8, enc5, "Zm9vYg=="));
+    try expect(std.mem.eql(u8, enc6, "Zm9vYmE="));
+    try expect(std.mem.eql(u8, enc7, "Zm9vYmFy"));
+    try expect(std.mem.eql(u8, enc8, "Zm9vYmFyZm9vYmFyZm9v"));
+    try expect(std.mem.eql(u8, enc9, "Zm9vYmFyZm9vYmFyZm9vYg=="));
+    try expect(std.mem.eql(u8, enc10, "Zm9vYmFyZm9vYmFyZm9vYmE="));
+    try expect(std.mem.eql(u8, enc11, "Zm9vYmFyZm9vYmFyZm9vYmFy"));
+
+    try expect(std.mem.eql(u8, dec1, ""));
+    try expect(std.mem.eql(u8, dec2, "f"));
+    try expect(std.mem.eql(u8, dec3, "fo"));
+    try expect(std.mem.eql(u8, dec4, "foo"));
+    try expect(std.mem.eql(u8, dec5, "foob"));
+    try expect(std.mem.eql(u8, dec6, "fooba"));
+    try expect(std.mem.eql(u8, dec7, "foobar"));
+    try expect(std.mem.eql(u8, dec8, "foobarfoobarfoo"));
+    try expect(std.mem.eql(u8, dec9, "foobarfoobarfoob"));
+    try expect(std.mem.eql(u8, dec10, "foobarfoobarfooba"));
+    try expect(std.mem.eql(u8, dec11, "foobarfoobarfoobar"));
 }
